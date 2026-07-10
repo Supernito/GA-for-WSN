@@ -38,7 +38,7 @@ NODES = int(input("Number of nodes: "))
 MAP_FILE_NAME = input("Map file name (if exists will be deleted): ")
 
 if dirname(argv[0]):
-    dst = "./maps/" + MAP_FILE_NAME
+    dst = dirname(argv[0]) + "/maps/" + MAP_FILE_NAME
 else:
     dst = "./maps/" + MAP_FILE_NAME
 
