@@ -1,4 +1,4 @@
-#! /usr/bin/python2
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
 #    Sensor network lifetime's maximization using genetic algorythms
@@ -60,7 +60,7 @@ def create_nodes_list(map_filename):
     else:
         map_path = "./maps/" + map_filename
 
-    with open(map_path, 'rb') as csvfile:
+    with open(map_path, newline='') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
             if row[0] and row[0].isdigit():

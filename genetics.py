@@ -1,4 +1,4 @@
-#! /usr/bin/python2
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # Sensor network lifetime's maximization using genetic algorythms
@@ -263,7 +263,7 @@ def operators(map_filename, popul, current_generation, total_generations):
             son = copy.deepcopy(father)
             #mutation
         u = random.random()
-        for k in range(0, len(popul[0].nodes) / 10):
+        for k in range(0, len(popul[0].nodes) // 10):
             if u < mut_prob:
                 son = mutation(son)
         #print j

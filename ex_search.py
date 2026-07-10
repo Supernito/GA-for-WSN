@@ -1,4 +1,4 @@
-#! /usr/bin/python2
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # Exhaustive search for a sensor network lifetime optimization
@@ -24,7 +24,7 @@ from sys import argv
 import population
 import genetics
 
-MAP_FILENAME = raw_input("insert de name of the map file: ")
+MAP_FILENAME = input("insert de name of the map file: ")
 #battery in kJ
 B = 15
 
@@ -90,7 +90,7 @@ while not goOut:
         #list must have at least one 0
         add(send_list, nodes_list_size - 1)
         continue
-    print ("Testing tree"), send_list
+    print("Testing tree", send_list)
     actual = population.Tree()
     actual.nodes = population.create_nodes_list(MAP_FILENAME)
     assign(send_list, actual)
@@ -105,7 +105,7 @@ if dirname(argv[0]):
 else:
     dst = "./results/" + MAP_FILENAME[:-4] + ".exres"
 
-print ("Saving results in"), dst
+print("Saving results in", dst)
 results_file = open(dst, 'w')
 for node in best.nodes:
     if node.i == 0:
