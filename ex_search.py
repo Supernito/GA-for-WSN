@@ -24,7 +24,10 @@ from sys import argv
 import population
 import genetics
 
-MAP_FILENAME = input("insert de name of the map file: ")
+if len(argv) > 1:
+    MAP_FILENAME = argv[1]
+else:
+    MAP_FILENAME = input("insert the name of the map file: ")
 #battery in kJ
 B = 15
 

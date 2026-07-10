@@ -30,7 +30,10 @@ from sys import argv
 GENERATIONS = 200
 POPULATION_SIZE = 200
 SOLUTIONS = 1
-MAP_FILENAME = input("insert the name of the map file: ")
+if len(argv) > 1:
+    MAP_FILENAME = argv[1]
+else:
+    MAP_FILENAME = input("insert the name of the map file: ")
 
 popul = population.create_population(MAP_FILENAME, POPULATION_SIZE)
 popul[0] = msttree(popul[0])
