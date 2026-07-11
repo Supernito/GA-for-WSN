@@ -23,3 +23,14 @@ node 0 is the base station). `ex_search.py` brute-forces the true optimum so
 GA results can be validated on small maps.
 
 Requires Python 3, standard library only.
+
+Note on historical results
+--------------------------
+
+The original 2012 `join()` stopped propagating `receive_from` bookkeeping
+after the first ancestor whenever it moved a subtree with more than one node,
+which under-counted relayed traffic and inflated reported lifetimes (shallow
+trees like `test.map` were unaffected, which is why its result matched the
+exhaustive optimum). Lifetime figures produced by the pre-2026 code on deeper
+networks should be re-derived with the current version, which keeps the
+bookkeeping consistent and only ever reports valid routing trees.

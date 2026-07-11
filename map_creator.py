@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Map creator for ensor network lifetime's maximization
+# Map creator for sensor network lifetime's maximization
 #    Copyright (C) 2012  Juan "Nito" Pou  juanpou@ono.com
 #
 #    This program is free software: you can redistribute it and/or modify

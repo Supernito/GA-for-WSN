@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Sensor network lifetime's maximization using genetic algorythms
+# Sensor network lifetime's maximization using genetic algorithms
 #    Copyright (C) 2012  Juan "Nito" Pou  juanpou@ono.com
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -40,15 +40,15 @@ popul[0] = msttree(popul[0])
 
 for treeIndex in range(1, len(popul)):
     genetics.join_tree_randomly(popul[treeIndex])
+#operators() already evaluates every new generation, so we only need
+#to evaluate the initial population once
+genetics.evaluation(popul)
 for g in range(GENERATIONS):
     print("Creating generation", g + 1)
     print("best: " + str(popul[0].lifetime))
-    genetics.avaluation(popul)
-    genetics.calc_sel_prob(popul)
     sons = genetics.operators(MAP_FILENAME, popul, g, GENERATIONS)
     popul = sons
 
-genetics.avaluation(popul)
 popul.sort(key=lambda x: x.lifetime, reverse=True)
 
 # RESULTS WRITING#
