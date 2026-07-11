@@ -31,8 +31,8 @@ class Node:
         self.y = float(y)
         self.g_i_ = float(g)
         self.send_to = -1
-        self.receive_from = []
-        self.can_send_to = []
+        self.receive_from = set()
+        self.can_send_to = set()
         self.energy_consumed = 0.0
 
     def __str__(self):

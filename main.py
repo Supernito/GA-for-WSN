@@ -40,14 +40,15 @@ popul[0] = msttree(popul[0])
 
 for treeIndex in range(1, len(popul)):
     genetics.join_tree_randomly(popul[treeIndex])
+#operators() already evaluates every new generation, so we only need
+#to evaluate the initial population once
+genetics.avaluation(popul)
 for g in range(GENERATIONS):
     print("Creating generation", g + 1)
     print("best: " + str(popul[0].lifetime))
-    genetics.avaluation(popul)
     sons = genetics.operators(MAP_FILENAME, popul, g, GENERATIONS)
     popul = sons
 
-genetics.avaluation(popul)
 popul.sort(key=lambda x: x.lifetime, reverse=True)
 
 # RESULTS WRITING#

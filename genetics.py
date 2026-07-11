@@ -64,71 +64,45 @@ def is_cicle(l):
 
 def refresh_can_send_list(t, n):
     """refresh the can_send_list of a node"""
-    #list of all nodes, remove the ones in the receive_from list and himself
-    refreshed = []
-    for i in range(len(t.nodes)):
-        refreshed.append(i)
-    for j in n.receive_from:
-        if j in refreshed:
-            refreshed.remove(j)
-    if n.i in refreshed:
-        refreshed.remove(n.i)
-    return refreshed
+    #all nodes except the ones in the receive_from set and himself
+    return set(range(len(t.nodes))) - n.receive_from - {n.i}
 
 
 def join(t, n1, n2):
     """join one node to another one"""
-    #we need a list with the nodes we have to move
-    subtree = []
-    #we change the destiny node
+    #the subtree that moves with n1
+    subtree = set(n1.receive_from)
+    subtree.add(n1.i)
+    #we change the destination node
     n1.send_to = t.nodes[n2.i].i
-    for n in n1.receive_from:
-        subtree.append(n)
-    subtree.append(n1.i)
-    #we need to refresh the receive_from list from the new parent 
+    #we need to refresh the receive_from set from the new parent
     #to the root (base station) with the subtree nodes
     node = n2
-    done = []
-    goout = False
-    while node.send_to >= 0 and not goout:
-        for x in subtree:
-            if node.i in done:
-                goout = True
-            node.receive_from.append(x)
-            node.can_send_to = refresh_can_send_list(t, node)
-            done.append(node.i)
+    done = set()
+    while node.i != 0 and node.i not in done:
+        node.receive_from |= subtree
+        node.can_send_to = refresh_can_send_list(t, node)
+        done.add(node.i)
+        if node.send_to < 0:
+            break
         node = t.nodes[node.send_to]
-    if node.i > 0:
-        for x in subtree:
-            node.receive_from.append(x)
-            node.can_send_to = refresh_can_send_list(t, node)
 
 
 def unjoin(t, n):
     """unjoin one node and his parent"""
     #same as join but inverse
-    subtree = []
-    for x in n.receive_from:
-        subtree.append(x)
-    subtree.append(n.i)
+    subtree = set(n.receive_from)
+    subtree.add(n.i)
     node = t.nodes[n.send_to]
     n.send_to = -1
-    done = []
-    goout = False
-    while node.send_to >= 0 and not goout:
-        for x in subtree:
-            if node.i in done:
-                goout = True
-            if x in node.receive_from:
-                node.receive_from.remove(x)
-            node.can_send_to = refresh_can_send_list(t, node)
-            done.append(node.i)
+    done = set()
+    while node.i != 0 and node.i not in done:
+        node.receive_from -= subtree
+        node.can_send_to = refresh_can_send_list(t, node)
+        done.add(node.i)
+        if node.send_to < 0:
+            break
         node = t.nodes[node.send_to]
-    if node.i > 0:
-        for x in subtree:
-            if x in node.receive_from:
-                node.receive_from.remove(x)
-            node.can_send_to = refresh_can_send_list(t, node)
 
 
 def calc_energy(t, n):
@@ -163,7 +137,7 @@ def join_tree_randomly(t):
         if n.i == 0:
             continue
         n.can_send_to = refresh_can_send_list(t, n)
-        join(t, n, t.nodes[random.choice(n.can_send_to)])
+        join(t, n, t.nodes[random.choice(list(n.can_send_to))])
 
 
 def select_parent(popul):
@@ -201,7 +175,7 @@ def crossover(map_filename, father, mother):
                 crossed = True
         if not crossed:
             #a random one
-            join(son, node, son.nodes[random.choice(node.can_send_to)])
+            join(son, node, son.nodes[random.choice(list(node.can_send_to))])
     return son
 
 
