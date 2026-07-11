@@ -187,12 +187,13 @@ def crossover(map_filename, father, mother):
 def mutation(tree):
     """mutation of a tree, in place; the caller must own the tree"""
     node = random.choice(tree.nodes)
-    if node.i == 0:
+    #skip the base station, and keep nodes that already send to it:
+    #re-parenting a base link is structurally valid, but benchmarks show it
+    #almost always wrecks the child, so the original guard stays
+    if node.i == 0 or node.send_to == 0:
         return
     #a fresh can_send_to excludes the node's own subtree, so any choice keeps
-    #the tree valid and reaching the base station; if this node holds the
-    #only link to the base, every other node is a descendant and there is
-    #nothing to choose
+    #the tree valid and reaching the base station
     selectables = refresh_can_send_list(tree, node) - {node.send_to}
     if selectables:
         unjoin(tree, node)
