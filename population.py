@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
-#    Sensor network lifetime's maximization using genetic algorythms
+#    Sensor network lifetime's maximization using genetic algorithms
 #    Copyright (C) 2012  Juan "Nito" Pou  juanpou@ono.com
 #
 #    This program is free software: you can redistribute it and/or modify

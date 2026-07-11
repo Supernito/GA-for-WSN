@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Sensor network lifetime's maximization using genetic algorythms
+# Sensor network lifetime's maximization using genetic algorithms
 # Copyright (C) 2012  Juan "Nito" Pou  juanpou@ono.com
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -34,7 +34,7 @@ TOURNAMENT_SIZE = 3
 M = 125 * 8
 #energy dissipated to transmit or receive a single bit in nJ/bit
 Eelec = 50
-#reference distance where multi-path fadinf effects starts
+#reference distance where multi-path fading effects start
 D0 = 75
 #Energy radiated to the wireless medium to transmit a single bit in distance 1
 #far-field region in pJ/bit/m2
@@ -47,8 +47,8 @@ F_IN_MULTIPATH = 4
 B = 15
 
 
-def is_cicle(l):
-    """checks if a list makes a cicle"""
+def is_cycle(l):
+    """checks if a list makes a cycle"""
     for e in l:
         if e.i == 0:
             continue
@@ -123,7 +123,7 @@ def calc_energy(t, n):
         ew * (10 ** -12)) * M * (d ** f)
 
 
-def avaluation(popul):
+def evaluation(popul):
     """calculation of the nodes energy wasted and the tree lifetime"""
     for t in popul:
         max_energy = 0.0
@@ -152,7 +152,7 @@ def select_parent(popul):
 
 
 def crossover(map_filename, father, mother):
-    """this function make the crossover between two trees"""
+    """this function makes the crossover between two trees"""
     son = population.Tree()
     son.nodes = population.create_nodes_list(map_filename)
     for node in son.nodes:
@@ -163,7 +163,7 @@ def crossover(map_filename, father, mother):
         u = random.random()
         if u < 0.5:
             if father.nodes[node.i].send_to in node.can_send_to:
-                #we chose farher and is selectable
+                #we chose father and is selectable
                 join(son, node, son.nodes[father.nodes[node.i].send_to])
                 crossed = True
             elif mother.nodes[node.i].send_to in node.can_send_to:
@@ -198,14 +198,14 @@ def mutation(t):
         unjoin(tree, node)
         new_node = tree.nodes[random.choice(selectables)]
         join(tree, node, new_node)
-        if is_cicle(tree.nodes):
+        if is_cycle(tree.nodes):
             unjoin(tree, node)
             join(tree, node, tree.nodes[saved_dst])
     return tree
 
 
 def operators(map_filename, popul, current_generation, total_generations):
-    """aplication of genetic operators"""
+    """application of genetic operators"""
     new_generation = []
     popul.sort(key=lambda x: x.lifetime, reverse=True)
     for i in range(0, ELITISM):
@@ -229,7 +229,7 @@ def operators(map_filename, popul, current_generation, total_generations):
                 son = mutation(son)
         #print j
         new_generation.append(son)
-    avaluation(new_generation)
+    evaluation(new_generation)
     new_generation.sort(key=lambda x: x.lifetime, reverse=True)
     new_generation = new_generation[:-ELITISM]
     return new_generation
