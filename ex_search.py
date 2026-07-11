@@ -18,7 +18,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import copy
-from os.path import dirname
+from os.path import dirname, splitext
 from sys import argv
 
 import population
@@ -28,20 +28,6 @@ if len(argv) > 1:
     MAP_FILENAME = argv[1]
 else:
     MAP_FILENAME = input("insert the name of the map file: ")
-#battery in kJ
-B = 15
-
-
-def calc_lifetime(t):
-    """calculation of a tree's lifetime"""
-    max_energy = 0.0
-    for n in t.nodes:
-        if n.i == 0:
-            continue
-        n.energy_consumed = genetics.calc_energy(t, n)
-        if n.energy_consumed > max_energy:
-            max_energy = n.energy_consumed
-    t.lifetime = (B * (10 ** 3)) / max_energy
 
 
 def assign(slist, t):
@@ -97,16 +83,17 @@ while not goOut:
     actual = population.Tree()
     actual.nodes = population.create_nodes_list(MAP_FILENAME)
     assign(send_list, actual)
-    calc_lifetime(actual)
+    #the same fitness the GA uses, so both tools stay comparable
+    genetics.evaluation([actual])
     if actual.lifetime > best.lifetime:
         best = copy.copy(actual)
     add(send_list, nodes_list_size - 1)
 
 #RESULTS WRITING#
 if dirname(argv[0]):
-    dst = dirname(argv[0]) + "/results/" + MAP_FILENAME[:-4] + ".exres"
+    dst = dirname(argv[0]) + "/results/" + splitext(MAP_FILENAME)[0] + ".exres"
 else:
-    dst = "./results/" + MAP_FILENAME[:-4] + ".exres"
+    dst = "./results/" + splitext(MAP_FILENAME)[0] + ".exres"
 
 print("Saving results in", dst)
 results_file = open(dst, 'w')
