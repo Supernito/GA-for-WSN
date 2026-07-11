@@ -201,29 +201,28 @@ def mutation(tree):
 
 def operators(map_filename, popul, current_generation, total_generations):
     """application of genetic operators"""
-    new_generation = []
     popul.sort(key=lambda x: x.lifetime, reverse=True)
-    for i in range(0, ELITISM):
-        new_generation.append(copy.deepcopy(popul[i]))
     #calculation of mutation probability (depending of generation)
     mut_prob = MUT_PROB_INI + (MUT_PROB_END - MUT_PROB_INI) * (float(current_generation) / (float(total_generations)))
-    #operations
-    for j in range(0, len(popul)):
+    #breed exactly len - ELITISM sons; the remaining slots are reserved
+    #for the elite copies, so no trimming is needed afterwards
+    new_generation = []
+    for j in range(0, len(popul) - ELITISM):
         #crossover
         father = popul[j]
-        u = random.random()
-        if u < CROSS_PROB:
+        if random.random() < CROSS_PROB:
             mother = select_parent(popul)
             son = crossover(map_filename, father, mother)
         else:
             son = copy.deepcopy(father)
-            #mutation
+        #mutation
         for k in range(0, max(1, len(popul[0].nodes) // 10)):
             if random.random() < mut_prob:
                 mutation(son)
-        #print j
         new_generation.append(son)
     evaluation(new_generation)
+    #elites keep the lifetime they already have
+    for i in range(0, ELITISM):
+        new_generation.append(copy.deepcopy(popul[i]))
     new_generation.sort(key=lambda x: x.lifetime, reverse=True)
-    new_generation = new_generation[:-ELITISM]
     return new_generation
