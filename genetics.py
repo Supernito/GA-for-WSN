@@ -142,7 +142,7 @@ def join_tree_randomly(t):
     for n in t.nodes:
         if n.i == 0:
             continue
-        join(t, n, t.nodes[random.choice(list(refresh_can_send_list(t, n)))])
+        join(t, n, t.nodes[random.choice(sorted(refresh_can_send_list(t, n)))])
 
 
 def select_parent(popul):
@@ -180,7 +180,7 @@ def crossover(map_filename, father, mother):
                 crossed = True
         if not crossed:
             #a random one
-            join(son, node, son.nodes[random.choice(list(can_send))])
+            join(son, node, son.nodes[random.choice(sorted(can_send))])
     return son
 
 
@@ -197,7 +197,7 @@ def mutation(tree):
     selectables = refresh_can_send_list(tree, node) - {node.send_to}
     if selectables:
         unjoin(tree, node)
-        join(tree, node, tree.nodes[random.choice(list(selectables))])
+        join(tree, node, tree.nodes[random.choice(sorted(selectables))])
 
 
 def operators(map_filename, popul, current_generation, total_generations):
