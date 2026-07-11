@@ -18,7 +18,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import copy
-from os.path import dirname
+from os.path import dirname, splitext
 from sys import argv
 
 import population
@@ -91,9 +91,9 @@ while not goOut:
 
 #RESULTS WRITING#
 if dirname(argv[0]):
-    dst = dirname(argv[0]) + "/results/" + MAP_FILENAME[:-4] + ".exres"
+    dst = dirname(argv[0]) + "/results/" + splitext(MAP_FILENAME)[0] + ".exres"
 else:
-    dst = "./results/" + MAP_FILENAME[:-4] + ".exres"
+    dst = "./results/" + splitext(MAP_FILENAME)[0] + ".exres"
 
 print("Saving results in", dst)
 results_file = open(dst, 'w')

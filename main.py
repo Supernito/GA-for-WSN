@@ -24,7 +24,7 @@ SEED = 7
 random.seed(SEED)
 import genetics
 import population
-from os.path import dirname
+from os.path import dirname, splitext
 from sys import argv
 
 GENERATIONS = 200
@@ -41,8 +41,9 @@ popul[0] = msttree(popul[0])
 for treeIndex in range(1, len(popul)):
     genetics.join_tree_randomly(popul[treeIndex])
 #operators() already evaluates every new generation, so we only need
-#to evaluate the initial population once
+#to evaluate (and sort, so the "best" print is right) the initial one
 genetics.evaluation(popul)
+popul.sort(key=lambda x: x.lifetime, reverse=True)
 for g in range(GENERATIONS):
     print("Creating generation", g + 1)
     print("best: " + str(popul[0].lifetime))
@@ -54,9 +55,9 @@ popul.sort(key=lambda x: x.lifetime, reverse=True)
 # RESULTS WRITING#
 
 if dirname(argv[0]):
-    dst = dirname(argv[0]) + "/results/" + MAP_FILENAME[:-4] + ".res"
+    dst = dirname(argv[0]) + "/results/" + splitext(MAP_FILENAME)[0] + ".res"
 else:
-    dst = "./results/" + MAP_FILENAME[:-4] + ".res"
+    dst = "./results/" + splitext(MAP_FILENAME)[0] + ".res"
 print("Saving results in", dst)
 results_file = open(dst, 'w')
 for s in range(SOLUTIONS):

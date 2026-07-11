@@ -63,9 +63,9 @@ def create_nodes_list(map_filename):
             for row in reader:
                 if row[0] and row[0].isdigit():
                 #to avoid the first row and other wrong ones
-                    rows.append(row)
+                    rows.append((int(row[0]), float(row[1]), float(row[2]), float(row[3])))
         _map_cache[map_filename] = rows
-    return [Node(row[0], row[1], row[2], row[3]) for row in _map_cache[map_filename]]
+    return [Node(i, x, y, g) for (i, x, y, g) in _map_cache[map_filename]]
 
 
 def create_population(map_filename, ntrees):
