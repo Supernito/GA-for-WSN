@@ -24,6 +24,15 @@ GA results can be validated on small maps.
 
 Requires Python 3, standard library only.
 
+Tests
+-----
+
+    python test_ga.py
+
+The suite checks the tree/bookkeeping invariants, the energy model, elitism
+monotonicity, and that the GA finds the exhaustive-search optimum on the
+small maps in `maps/`. It also runs on every push via GitHub Actions.
+
 Note on historical results
 --------------------------
 
