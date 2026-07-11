@@ -47,21 +47,6 @@ F_IN_MULTIPATH = 4
 B = 15
 
 
-def is_cycle(l):
-    """checks if a list makes a cycle"""
-    for e in l:
-        if e.i == 0:
-            continue
-        e = l[e.send_to]
-        done = []
-        while e.send_to != 0 and e.send_to != -1 and not e.i in done:
-            done.append(e.i)
-            e = l[e.send_to]
-        if e.i in done:
-            return True
-    return False
-
-
 def refresh_can_send_list(t, n):
     """refresh the can_send_list of a node"""
     #all nodes except the ones in the receive_from set and himself
@@ -81,7 +66,6 @@ def join(t, n1, n2):
     done = set()
     while node.i != 0 and node.i not in done:
         node.receive_from |= subtree
-        node.can_send_to = refresh_can_send_list(t, node)
         done.add(node.i)
         if node.send_to < 0:
             break
@@ -98,7 +82,6 @@ def unjoin(t, n):
     done = set()
     while node.i != 0 and node.i not in done:
         node.receive_from -= subtree
-        node.can_send_to = refresh_can_send_list(t, node)
         done.add(node.i)
         if node.send_to < 0:
             break
@@ -141,8 +124,7 @@ def join_tree_randomly(t):
     for n in t.nodes:
         if n.i == 0:
             continue
-        n.can_send_to = refresh_can_send_list(t, n)
-        join(t, n, t.nodes[random.choice(list(n.can_send_to))])
+        join(t, n, t.nodes[random.choice(list(refresh_can_send_list(t, n)))])
 
 
 def select_parent(popul):
@@ -159,49 +141,44 @@ def crossover(map_filename, father, mother):
         crossed = False
         if node.i == 0:
             continue
-        node.can_send_to = refresh_can_send_list(son, node)
+        can_send = refresh_can_send_list(son, node)
         u = random.random()
         if u < 0.5:
-            if father.nodes[node.i].send_to in node.can_send_to:
+            if father.nodes[node.i].send_to in can_send:
                 #we chose father and is selectable
                 join(son, node, son.nodes[father.nodes[node.i].send_to])
                 crossed = True
-            elif mother.nodes[node.i].send_to in node.can_send_to:
+            elif mother.nodes[node.i].send_to in can_send:
                 #we chose father but is not selectable, we cross with the mother
                 join(son, node, son.nodes[mother.nodes[node.i].send_to])
                 crossed = True
         else:
             #we chose mother and we do the same thing upside down
-            if mother.nodes[node.i].send_to in node.can_send_to:
+            if mother.nodes[node.i].send_to in can_send:
                 join(son, node, son.nodes[mother.nodes[node.i].send_to])
                 crossed = True
-            elif father.nodes[node.i].send_to in node.can_send_to:
+            elif father.nodes[node.i].send_to in can_send:
                 join(son, node, son.nodes[father.nodes[node.i].send_to])
                 crossed = True
         if not crossed:
             #a random one
-            join(son, node, son.nodes[random.choice(list(node.can_send_to))])
+            join(son, node, son.nodes[random.choice(list(can_send))])
     return son
 
 
-def mutation(t):
-    """mutation of a tree"""
-    tree = copy.deepcopy(t)
+def mutation(tree):
+    """mutation of a tree, in place; the caller must own the tree"""
     node = random.choice(tree.nodes)
-    saved_dst = node.send_to
-    #if node.can_send_to[] is size 1 we can't change the destination.
-    # Changing the destination if its 0 can make no node send to 0
-    if len(node.can_send_to) > 1 and node.send_to != 0:
-        selectables = list(node.can_send_to)
-        if node.send_to in selectables:
-            selectables.remove(node.send_to)
+    if node.i == 0:
+        return
+    #a fresh can_send_to excludes the node's own subtree, so any choice keeps
+    #the tree valid and reaching the base station; if this node holds the
+    #only link to the base, every other node is a descendant and there is
+    #nothing to choose
+    selectables = refresh_can_send_list(tree, node) - {node.send_to}
+    if selectables:
         unjoin(tree, node)
-        new_node = tree.nodes[random.choice(selectables)]
-        join(tree, node, new_node)
-        if is_cycle(tree.nodes):
-            unjoin(tree, node)
-            join(tree, node, tree.nodes[saved_dst])
-    return tree
+        join(tree, node, tree.nodes[random.choice(list(selectables))])
 
 
 def operators(map_filename, popul, current_generation, total_generations):
@@ -224,9 +201,8 @@ def operators(map_filename, popul, current_generation, total_generations):
             son = copy.deepcopy(father)
             #mutation
         for k in range(0, max(1, len(popul[0].nodes) // 10)):
-            u = random.random()
-            if u < mut_prob:
-                son = mutation(son)
+            if random.random() < mut_prob:
+                mutation(son)
         #print j
         new_generation.append(son)
     evaluation(new_generation)
