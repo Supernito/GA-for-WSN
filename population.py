@@ -45,10 +45,6 @@ class Tree:
     def __init__(self):
         self.nodes = []
         self.lifetime = 0.0
-        self.sel_prob = 0.0
-        #selection probability
-        self.acc_sel_prob = 0.0
-        #accumulated selection probability
 
 
 #parsed map rows, so crossover does not re-read the file for every child

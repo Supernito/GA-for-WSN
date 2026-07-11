@@ -27,6 +27,8 @@ CROSS_PROB = 0.8
 MUT_PROB_INI = 0.0
 MUT_PROB_END = 0.8
 ELITISM = 2
+#number of individuals that compete in each selection tournament
+TOURNAMENT_SIZE = 3
 
 #packet size in bits
 M = 125 * 8
@@ -58,16 +60,6 @@ def is_cicle(l):
         if e.i in done:
             return True
     return False
-
-
-def calc_sel_prob(popul):
-    """calculation of crossover probabilities using lifetime"""
-    #summation of nodes lifetimes
-    s = 0.0
-    for t in popul:
-        s = s + t.lifetime
-    for t in popul:
-        t.sel_prob = t.lifetime / s
 
 
 def refresh_can_send_list(t, n):
@@ -175,14 +167,9 @@ def join_tree_randomly(t):
 
 
 def select_parent(popul):
-    """selection of a tree using crossover probability"""
-    u = random.random()
-    selected = popul[0]
-    for t in popul:
-        if u <= t.acc_sel_prob:
-            selected = t
-            break
-    return selected
+    """selection of a tree by tournament"""
+    candidates = random.sample(popul, min(TOURNAMENT_SIZE, len(popul)))
+    return max(candidates, key=lambda x: x.lifetime)
 
 
 def crossover(map_filename, father, mother):
@@ -240,16 +227,11 @@ def mutation(t):
 
 def operators(map_filename, popul, current_generation, total_generations):
     """aplication of genetic operators"""
-    p = 0.0
     new_generation = []
     popul.sort(key=lambda x: x.lifetime, reverse=True)
     for i in range(0, ELITISM):
         new_generation.append(copy.deepcopy(popul[i]))
-        #calculation of accumulated probabilities
-    for t in popul:
-        p += t.sel_prob
-        t.acc_sel_prob = p
-        #calculation of mutation probability (depending of generation)
+    #calculation of mutation probability (depending of generation)
     mut_prob = MUT_PROB_INI + (MUT_PROB_END - MUT_PROB_INI) * (float(current_generation) / (float(total_generations)))
     #operations
     for j in range(0, len(popul)):

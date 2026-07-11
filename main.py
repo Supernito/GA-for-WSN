@@ -44,7 +44,6 @@ for g in range(GENERATIONS):
     print("Creating generation", g + 1)
     print("best: " + str(popul[0].lifetime))
     genetics.avaluation(popul)
-    genetics.calc_sel_prob(popul)
     sons = genetics.operators(MAP_FILENAME, popul, g, GENERATIONS)
     popul = sons
 
