@@ -1,4 +1,4 @@
-#! /usr/bin/python2
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # Map creator for ensor network lifetime's maximization
@@ -33,16 +33,16 @@ MAX_Y = 1000
 MAX_G_i_ = 5
 
 #Number of nodes
-NODES = input("Number of nodes: ")
+NODES = int(input("Number of nodes: "))
 #Name of the map file 
-MAP_FILE_NAME = raw_input("Map file name (if exists will be deleted): ")
+MAP_FILE_NAME = input("Map file name (if exists will be deleted): ")
 
 if dirname(argv[0]):
-    dst = "./maps/" + MAP_FILE_NAME
+    dst = dirname(argv[0]) + "/maps/" + MAP_FILE_NAME
 else:
     dst = "./maps/" + MAP_FILE_NAME
 
-MAP_FILE = csv.writer(open(dst, "wb"))
+MAP_FILE = csv.writer(open(dst, "w", newline=""))
 MAP_FILE.writerow(["Node number", "X", "Y", "g(i)"])
 #Base station creation
 MAP_FILE.writerow(["0", "0", "500", "0"])

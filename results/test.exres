@@ -1,4 +1,3 @@
-=============== SOLUTION 1 ================
 Node 1 should send to node 0
 Node 2 should send to node 3
 Node 3 should send to node 1

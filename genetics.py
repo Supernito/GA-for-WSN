@@ -1,4 +1,4 @@
-#! /usr/bin/python2
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # Sensor network lifetime's maximization using genetic algorythms
@@ -230,11 +230,11 @@ def mutation(t):
         if node.send_to in selectables:
             selectables.remove(node.send_to)
         unjoin(tree, node)
-        new_node = t.nodes[random.choice(selectables)]
+        new_node = tree.nodes[random.choice(selectables)]
         join(tree, node, new_node)
         if is_cicle(tree.nodes):
-            unjoin(tree, new_node)
-            join(tree, node, t.nodes[saved_dst])
+            unjoin(tree, node)
+            join(tree, node, tree.nodes[saved_dst])
     return tree
 
 
@@ -262,8 +262,8 @@ def operators(map_filename, popul, current_generation, total_generations):
         else:
             son = copy.deepcopy(father)
             #mutation
-        u = random.random()
-        for k in range(0, len(popul[0].nodes) / 10):
+        for k in range(0, max(1, len(popul[0].nodes) // 10)):
+            u = random.random()
             if u < mut_prob:
                 son = mutation(son)
         #print j

@@ -1,4 +1,4 @@
-#! /usr/bin/python2
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # Return the MST of a tree.
@@ -19,7 +19,6 @@
 
 from genetics import join
 from math import sqrt
-from sys import maxint
 
 
 def calcdst(nodea, nodeb, tree):
@@ -32,7 +31,7 @@ def makeclosestlist(chosennodes, tree):
     for chosenNode in chosennodes:
         nodea = chosenNode
         nodeb = -1
-        bestdst = maxint
+        bestdst = float("inf")
         for node in range(0, len(tree.nodes)):
             if chosenNode == node:
                 continue
@@ -46,7 +45,7 @@ def makeclosestlist(chosennodes, tree):
 
 #dada una lista de [nodeA, nodeB, dst], devuelve una lista con los dos nodos más cercanos [nodeA, nodeB]
 def selectclosest(closestlist):
-    bestdst = maxint
+    bestdst = float("inf")
     nodea = -1
     nodeb = -1
     for e in closestlist:

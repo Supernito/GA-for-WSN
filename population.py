@@ -1,4 +1,4 @@
-#! /usr/bin/python2
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
 #    Sensor network lifetime's maximization using genetic algorythms
@@ -51,23 +51,26 @@ class Tree:
         #accumulated selection probability
 
 
+#parsed map rows, so crossover does not re-read the file for every child
+_map_cache = {}
+
+
 def create_nodes_list(map_filename):
     """creation of a list of nodes using a map file"""
-    nodes_list = []
-    n = 0
-    if dirname(argv[0]):
-        map_path = dirname(argv[0]) + "/maps/" + map_filename
-    else:
-        map_path = "./maps/" + map_filename
-
-    with open(map_path, 'rb') as csvfile:
-        reader = csv.reader(csvfile)
-        for row in reader:
-            if row[0] and row[0].isdigit():
-            #to avoid the first row and other wrong ones
-                n += 1
-                nodes_list.append(Node(row[0], row[1], row[2], row[3]))
-    return nodes_list
+    if map_filename not in _map_cache:
+        if dirname(argv[0]):
+            map_path = dirname(argv[0]) + "/maps/" + map_filename
+        else:
+            map_path = "./maps/" + map_filename
+        rows = []
+        with open(map_path, newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                if row[0] and row[0].isdigit():
+                #to avoid the first row and other wrong ones
+                    rows.append(row)
+        _map_cache[map_filename] = rows
+    return [Node(row[0], row[1], row[2], row[3]) for row in _map_cache[map_filename]]
 
 
 def create_population(map_filename, ntrees):
