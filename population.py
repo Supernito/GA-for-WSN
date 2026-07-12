@@ -19,7 +19,7 @@
 
 import csv
 from sys import argv
-from os.path import dirname
+from os.path import dirname, basename, join
 
 
 class Node:
@@ -50,21 +50,43 @@ class Tree:
 _map_cache = {}
 
 
+def map_path(map_filename):
+    """path to a map, kept inside maps/ (basename strips any directory
+    component so a crafted name cannot escape the folder)"""
+    return join(dirname(argv[0]) or ".", "maps", basename(map_filename))
+
+
+def _parse_map(map_filename):
+    """read and validate a map file into (i, x, y, g) rows; node ids must be
+    the contiguous 0..n-1 in row order, since the rest of the code uses the
+    id as the position in Tree.nodes"""
+    rows = []
+    with open(map_path(map_filename), newline='') as csvfile:
+        for lineno, row in enumerate(csv.reader(csvfile), 1):
+            #skip the header, blank lines and any other non-data row
+            if not row or not row[0].isdigit():
+                continue
+            if len(row) < 4:
+                raise ValueError("%s line %d: expected 4 columns (id,x,y,g), got %d"
+                                 % (map_filename, lineno, len(row)))
+            try:
+                rows.append((int(row[0]), float(row[1]), float(row[2]), float(row[3])))
+            except ValueError:
+                raise ValueError("%s line %d: non-numeric field in %r"
+                                 % (map_filename, lineno, row))
+    if not rows:
+        raise ValueError("%s: no node rows found" % map_filename)
+    for expected, row in enumerate(rows):
+        if row[0] != expected:
+            raise ValueError("%s: node ids must be 0..n-1 in order; expected %d, got %d"
+                             % (map_filename, expected, row[0]))
+    return rows
+
+
 def create_nodes_list(map_filename):
     """creation of a list of nodes using a map file"""
     if map_filename not in _map_cache:
-        if dirname(argv[0]):
-            map_path = dirname(argv[0]) + "/maps/" + map_filename
-        else:
-            map_path = "./maps/" + map_filename
-        rows = []
-        with open(map_path, newline='') as csvfile:
-            reader = csv.reader(csvfile)
-            for row in reader:
-                if row[0] and row[0].isdigit():
-                #to avoid the first row and other wrong ones
-                    rows.append((int(row[0]), float(row[1]), float(row[2]), float(row[3])))
-        _map_cache[map_filename] = rows
+        _map_cache[map_filename] = _parse_map(map_filename)
     return [Node(i, x, y, g) for (i, x, y, g) in _map_cache[map_filename]]
 
 

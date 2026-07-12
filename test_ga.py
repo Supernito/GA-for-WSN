@@ -112,6 +112,9 @@ class TestBookkeeping(unittest.TestCase):
         for _ in range(trials):
             clone = copy.deepcopy(tree)
             genetics.mutation(clone)
+            #a mutation must never leave the tree invalid or its bookkeeping drifted
+            self.assertTrue(is_valid(clone))
+            check_bookkeeping(self, clone)
             if [n.send_to for n in clone.nodes] != before:
                 changed += 1
         self.assertGreater(changed / trials, 0.25)
@@ -129,6 +132,25 @@ class TestEvaluation(unittest.TestCase):
             for n in tree.nodes:
                 expected = sum(tree.nodes[i].g_i_ for i in desc[n.i])
                 self.assertAlmostEqual(relayed[n.i], expected)
+
+    def test_relayed_is_g_weighted_not_a_count(self):
+        #het7.map has g != 1, so relayed traffic (sum of g) must differ from
+        #the plain descendant count -- this is what distinguishes the
+        #heterogeneous sigma(i) fix from the old len(receive_from)
+        random.seed(50)
+        distinguished = False
+        for _ in range(10):
+            tree = build_random_tree('het7.map')
+            relayed = genetics.calc_relayed(tree)
+            desc = true_descendants(tree)
+            for n in tree.nodes:
+                expected = sum(tree.nodes[i].g_i_ for i in desc[n.i])
+                self.assertAlmostEqual(relayed[n.i], expected)
+                if abs(expected - len(desc[n.i])) > 1e-9:
+                    distinguished = True
+        #guard against the fixture silently reverting to all-g=1
+        self.assertTrue(distinguished,
+                        "het7.map must exercise g != 1 for this test to bite")
 
     def test_lifetime_is_positive(self):
         random.seed(6)
@@ -153,7 +175,10 @@ class TestOperators(unittest.TestCase):
             self.assertEqual(len(popul), 30)
             self.assertGreaterEqual(popul[0].lifetime, best)
             best = popul[0].lifetime
-            self.assertTrue(is_valid(popul[0]))
+            #every bred individual must be valid, not just the elite on top
+            for t in popul:
+                self.assertTrue(is_valid(t))
+                check_bookkeeping(self, t)
 
 
 class TestOptimum(unittest.TestCase):
@@ -176,6 +201,10 @@ class TestOptimum(unittest.TestCase):
 
     def test_val7_map(self):
         self.ga_matches_exhaustive('val7.map')
+
+    def test_het7_map(self):
+        #heterogeneous g(i): the GA must reach the true optimum end-to-end
+        self.ga_matches_exhaustive('het7.map')
 
 
 if __name__ == '__main__':

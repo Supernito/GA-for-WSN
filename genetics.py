@@ -107,7 +107,9 @@ def calc_relayed(t):
     recursion from the project documentation, derived from send_to alone"""
     children = [[] for _ in t.nodes]
     for n in t.nodes:
-        if n.i != 0:
+        #skip the base and any detached node; send_to == -1 would otherwise
+        #index children[-1] and silently misattribute the traffic
+        if n.i != 0 and n.send_to >= 0:
             children[n.send_to].append(n.i)
     relayed = [0.0] * len(t.nodes)
     pending = [(0, False)]

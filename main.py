@@ -24,7 +24,7 @@ SEED = 7
 random.seed(SEED)
 import genetics
 import population
-from os.path import dirname, splitext
+from os.path import dirname, splitext, basename, join
 from sys import argv
 
 GENERATIONS = 200
@@ -60,10 +60,8 @@ if __name__ == "__main__":
 
     # RESULTS WRITING#
 
-    if dirname(argv[0]):
-        dst = dirname(argv[0]) + "/results/" + splitext(MAP_FILENAME)[0] + ".res"
-    else:
-        dst = "./results/" + splitext(MAP_FILENAME)[0] + ".res"
+    name = splitext(basename(MAP_FILENAME))[0]
+    dst = join(dirname(argv[0]) or ".", "results", name + ".res")
     print("Saving results in", dst)
     results_file = open(dst, 'w')
     for s in range(SOLUTIONS):
