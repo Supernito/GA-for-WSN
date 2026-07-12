@@ -17,7 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from os.path import dirname, splitext
+from os.path import dirname, splitext, basename, join
 from sys import argv
 
 import population
@@ -86,10 +86,8 @@ if __name__ == "__main__":
     best = search(MAP_FILENAME)
 
     #RESULTS WRITING#
-    if dirname(argv[0]):
-        dst = dirname(argv[0]) + "/results/" + splitext(MAP_FILENAME)[0] + ".exres"
-    else:
-        dst = "./results/" + splitext(MAP_FILENAME)[0] + ".exres"
+    name = splitext(basename(MAP_FILENAME))[0]
+    dst = join(dirname(argv[0]) or ".", "results", name + ".exres")
 
     print("Saving results in", dst)
     results_file = open(dst, 'w')
